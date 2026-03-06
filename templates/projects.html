@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">🚀 Add Project</h2>
+    </div>
+    <form action="/projects/add" method="post">
+        <div style="display: grid; gap: 1rem;">
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" name="name" placeholder="Project name" required style="flex: 1;">
+                <input type="text" name="description" placeholder="Description" style="flex: 2;">
+                <button type="submit">Add Project</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">🚀 All Projects ({{ projects|length }})</h2>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Updated</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td><strong>{{ project.name }}</strong></td>
+                <td>{{ project.description or '-' }}</td>
+                <td>
+                    <span class="tag {{ project.status }}">{{ project.status }}</span>
+                </td>
+                <td>{{ project.updated_at }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-secondary);">No projects yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

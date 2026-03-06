@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-grid">
+    <a href="/messages" class="stat-card">
+        <div class="stat-icon messages">💬</div>
+        <div class="stat-info">
+            <h3>{{ messages_count }}</h3>
+            <p>Messages</p>
+        </div>
+    </a>
+    
+    <a href="/quotes" class="stat-card">
+        <div class="stat-icon quotes">📝</div>
+        <div class="stat-info">
+            <h3>{{ quotes_count }}</h3>
+            <p>Quotes</p>
+        </div>
+    </a>
+    
+    <a href="/projects" class="stat-card">
+        <div class="stat-icon projects">🚀</div>
+        <div class="stat-info">
+            <h3>{{ projects_count }}</h3>
+            <p>Projects</p>
+        </div>
+    </a>
+    
+    <a href="/notes" class="stat-card">
+        <div class="stat-icon notes">📚</div>
+        <div class="stat-info">
+            <h3>{{ notes_count }}</h3>
+            <p>Notes</p>
+        </div>
+    </a>
+</div>
+
+<!-- Quick Add -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">⚡ Quick Add</h2>
+    </div>
+    <form action="/messages/add" method="post" style="display: flex; gap: 8px;">
+        <input type="text" name="content" placeholder="💬 Add a message..." style="flex: 1;">
+        <input type="text" name="tags" placeholder="Tags" style="width: 150px;">
+        <button type="submit">Add</button>
+    </form>
+    <form action="/quotes/add" method="post" style="display: flex; gap: 8px; margin-top: 8px;">
+        <input type="text" name="content" placeholder="📝 Add a quote..." style="flex: 1;">
+        <input type="text" name="author" placeholder="Author" style="width: 150px;">
+        <button type="submit" class="secondary">Quote</button>
+    </form>
+</div>
+
+<!-- Recent Activity -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+    
+    <!-- Recent Messages -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">💬 Recent Messages</h2>
+            <a href="/messages" style="color: var(--accent); text-decoration: none;">View all →</a>
+        </div>
+        <div class="item-list">
+            {% for message in recent_messages %}
+            <div class="item">
+                <div class="item-content">{{ message.content }}</div>
+                <div class="item-meta">
+                    {{ message.created_at }} {% if message.tags %}· {{ message.tags }}{% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p style="color: var(--text-secondary);">No messages yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Recent Quotes -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📝 Recent Quotes</h2>
+            <a href="/quotes" style="color: var(--accent); text-decoration: none;">View all →</a>
+        </div>
+        <div class="item-list">
+            {% for quote in recent_quotes %}
+            <div class="quote">
+                <div class="quote-text">"{{ quote.content }}"</div>
+                <div class="quote-author">— {{ quote.author or 'Unknown' }}</div>
+            </div>
+            {% else %}
+            <p style="color: var(--text-secondary);">No quotes yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Active Projects -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">🚀 Active Projects</h2>
+            <a href="/projects" style="color: var(--accent); text-decoration: none;">View all →</a>
+        </div>
+        <div class="item-list">
+            {% for project in active_projects %}
+            <div class="item">
+                <div class="item-content">{{ project.name }}</div>
+                <div class="item-meta">
+                    {{ project.description or 'No description' }}
+                </div>
+            </div>
+            {% else %}
+            <p style="color: var(--text-secondary);">No active projects.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

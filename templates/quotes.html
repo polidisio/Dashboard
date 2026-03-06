@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Quotes{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">📝 Add Quote</h2>
+    </div>
+    <form action="/quotes/add" method="post">
+        <div style="display: grid; gap: 1rem;">
+            <div class="form-group" style="margin: 0;">
+                <textarea name="content" placeholder="Quote text..." required></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" name="author" placeholder="Author">
+                <input type="text" name="source" placeholder="Source (book, movie, etc.)">
+                <button type="submit">Add Quote</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 All Quotes ({{ quotes|length }})</h2>
+    </div>
+    {% for quote in quotes %}
+    <div class="quote">
+        <div class="quote-text">"{{ quote.content }}"</div>
+        <div class="quote-author">
+            — {{ quote.author or 'Unknown' }}
+            {% if quote.source %} · {{ quote.source }}{% endif %}
+            <span style="float: right; color: var(--text-secondary);">{{ quote.created_at }}</span>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary);">No quotes yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

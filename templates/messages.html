@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">💬 Add Message</h2>
+    </div>
+    <form action="/messages/add" method="post">
+        <div style="display: grid; gap: 1rem;">
+            <div class="form-group" style="margin: 0;">
+                <textarea name="content" placeholder="Write your message..." required></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" name="tags" placeholder="Tags (comma separated)" style="flex: 1;">
+                <select name="source" style="width: 150px;">
+                    <option value="telegram">Telegram</option>
+                    <option value="web">Web</option>
+                    <option value="other">Other</option>
+                </select>
+                <button type="submit">Add Message</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Search -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">🔍 Search Messages</h2>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+        <input type="text" id="messageSearch" placeholder="Search messages..." onkeyup="searchMessages(this.value)" style="flex: 1;">
+        <input type="date" id="dateFrom" onchange="filterByDate()">
+        <input type="date" id="dateTo" onchange="filterByDate()">
+        <button class="secondary" onclick="clearFilters()">Clear</button>
+    </div>
+    <div id="searchResults" class="item-list" style="margin-top: 1rem;"></div>
+</div>
+
+<!-- Messages by Date -->
+<div id="messagesByDate">
+    {% for date, messages in messages_by_date.items() %}
+    <div class="date-group" style="margin-bottom: 2rem;">
+        <div class="date-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">
+            <span style="font-size: 1.25rem; font-weight: 600;">📅 {{ date }}</span>
+            <span class="tag">{{ messages|length }} messages</span>
+        </div>
+        
+        <div class="card">
+            <div class="item-list">
+                {% for message in messages %}
+                <div class="item" data-date="{{ message.created_at[:10] }}">
+                    <div class="item-content">{{ message.content }}</div>
+                    <div class="item-meta">
+                        {{ message.created_at[11:16] }} · 
+                        <span class="tag">{{ message.source }}</span>
+                        {% if message.tags %}
+                        {% for tag in message.tags.split(',') %}
+                        <span class="tag" style="background: rgba(0, 212, 170, 0.15); color: var(--accent);">{{ tag.strip() }}</span>
+                        {% endfor %}
+                        {% endif %}
+                        <form action="/messages/delete/{{ message.id }}" method="post" style="display: inline; float: right;">
+                            <button type="submit" style="background: none; border: none; color: var(--error); cursor: pointer; padding: 0;">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No messages yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function searchMessages(query) {
+        const resultsDiv = document.getElementById('searchResults');
+        
+        if (query.length < 2) {
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        
+        fetch(`/api/search?q=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+                let html = '';
+                data.messages.forEach(m => {
+                    html += `
+                        <div class="item">
+                            <div class="item-content">${m.content}</div>
+                            <div class="item-meta">${m.created_at} · ${m.source}</div>
+                        </div>
+                    `;
+                });
+                resultsDiv.innerHTML = html || '<p style="color: var(--text-secondary);">No results found.</p>';
+            });
+    }
+    
+    function filterByDate() {
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        if (!dateFrom && !dateTo) return;
+        
+        fetch(`/api/messages?date_from=${dateFrom || ''}&date_to=${dateTo || ''}`)
+            .then(r => r.json())
+            .then(messages => {
+                let html = '';
+                messages.forEach(m => {
+                    html += `
+                        <div class="item">
+                            <div class="item-content">${m.content}</div>
+                            <div class="item-meta">${m.created_at} · ${m.source}</div>
+                        </div>
+                    `;
+                });
+                document.getElementById('messagesByDate').innerHTML = html || '<p>No messages found.</p>';
+            });
+    }
+    
+    function clearFilters() {
+        document.getElementById('messageSearch').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        document.getElementById('searchResults').innerHTML = '';
+        location.reload();
+    }
+</script>
+{% endblock %}

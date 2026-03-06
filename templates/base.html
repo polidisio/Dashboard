@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} - Jose's Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #1a1f2e;
+            --bg-card: #141820;
+            --accent: #00d4aa;
+            --accent-dim: #00a88a;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --success: #3fb950;
+            --warning: #d29922;
+            --error: #f85149;
+            --purple: #a371f7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo span {
+            color: var(--text-primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: var(--bg-card);
+            color: var(--accent);
+        }
+        
+        /* Search */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .search-bar input {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 300px;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.messages { background: rgba(0, 212, 170, 0.15); color: var(--accent); }
+        .stat-icon.quotes { background: rgba(163, 113, 247, 0.15); color: var(--purple); }
+        .stat-icon.projects { background: rgba(210, 153, 34, 0.15); color: var(--warning); }
+        .stat-icon.notes { background: rgba(63, 185, 80, 0.15); color: var(--success); }
+        
+        .stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .stat-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Lists */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .item {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .item:hover {
+            border-color: var(--border);
+        }
+        
+        .item-content {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        
+        .item-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        button {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: var(--accent-dim);
+        }
+        
+        button.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        button.secondary:hover {
+            background: var(--bg-card);
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        tr:hover td {
+            background: var(--bg-secondary);
+        }
+        
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .tag.active { background: rgba(0, 212, 170, 0.15); color: var(--accent); }
+        .tag.completed { background: rgba(63, 185, 80, 0.15); color: var(--success); }
+        .tag.paused { background: rgba(210, 153, 34, 0.15); color: var(--warning); }
+        
+        /* Quote */
+        .quote {
+            font-style: italic;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border-left: 3px solid var(--purple);
+            margin-bottom: 1rem;
+        }
+        
+        .quote-text {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .quote-author {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .search-bar input {
+                width: 100%;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="/" class="logo">
+                ⚡ <span>Jose's</span> Dashboard
+            </a>
+            
+            <nav>
+                <a href="/" {% if request.path == '/' %}class="active"{% endif %}>🏠 Home</a>
+                <a href="/messages" {% if '/messages' in request.path %}class="active"{% endif %}>💬 Messages</a>
+                <a href="/quotes" {% if '/quotes' in request.path %}class="active"{% endif %}>📝 Quotes</a>
+                <a href="/projects" {% if '/projects' in request.path %}class="active"{% endif %}>🚀 Projects</a>
+                <a href="/notes" {% if '/notes' in request.path %}class="active"{% endif %}>📚 Notes</a>
+            </nav>
+            
+            <div class="search-bar">
+                <input type="text" id="globalSearch" placeholder="🔍 Search..." onkeyup="search(this.value)">
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- Search Results Modal -->
+    <div id="searchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Search Results</h2>
+                <button class="modal-close" onclick="closeSearch()">×</button>
+            </div>
+            <div id="searchResults"></div>
+        </div>
+    </div>
+    
+    <script>
+        function search(query) {
+            if (query.length < 2) {
+                document.getElementById('searchModal').classList.remove('active');
+                return;
+            }
+            
+            fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    let html = '';
+                    
+                    if (data.messages.length) {
+                        html += '<h3>Messages</h3>';
+                        data.messages.slice(0, 3).forEach(m => {
+                            html += `<div class="item"><div class="item-content">${m.content}</div></div>`;
+                        });
+                    }
+                    
+                    if (data.quotes.length) {
+                        html += '<h3>Quotes</h3>';
+                        data.quotes.slice(0, 3).forEach(q => {
+                            html += `<div class="item"><div class="item-content">"${q.content}" - ${q.author}</div></div>`;
+                        });
+                    }
+                    
+                    if (data.projects.length) {
+                        html += '<h3>Projects</h3>';
+                        data.projects.slice(0, 3).forEach(p => {
+                            html += `<div class="item"><div class="item-content">${p.name}</div></div>`;
+                        });
+                    }
+                    
+                    if (data.notes.length) {
+                        html += '<h3>Notes</h3>';
+                        data.notes.slice(0, 3).forEach(n => {
+                            html += `<div class="item"><div class="item-content">${n.title}</div></div>`;
+                        });
+                    }
+                    
+                    if (!html) html = '<p>No results found.</p>';
+                    
+                    document.getElementById('searchResults').innerHTML = html;
+                    document.getElementById('searchModal').classList.add('active');
+                });
+        }
+        
+        function closeSearch() {
+            document.getElementById('searchModal').classList.remove('active');
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
